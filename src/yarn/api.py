@@ -7,9 +7,8 @@ from contextlib import contextmanager
 
 # TODO: Get the setup.py for runner started
 # TODO: Work up the list of context managers
-# TODO: Setup command line arguments for the 'knit'
+# TODO: Setup command line arguments for the 'yarn' command-line tool
 
-# ATTRIBUTION: I followed the tutorial I found at: http://jessenoller.com/2009/02/05/ssh-programming-with-paramiko-completely-different/
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -21,7 +20,7 @@ class Environment:
     debug = True
     user = None
     password = None
-    working_directory = None
+    working_directory = list()
     warn_only = True
     quiet = False
 
@@ -48,15 +47,15 @@ def ssh_connection(wrapped_function):
 
 @contextmanager
 def cd(path):
-    env.working_directory = path
+    env.working_directory.append(path)
     yield
-    env.working_directory = None
+    env.working_directory.pop()
 
 
 @ssh_connection
 def run(*args, **kwargs):
     if env.working_directory:
-        command = "cd {} && {}".format(env.working_directory, args[0])
+        command = "cd {} && {}".format(os.path.join(*env.working_directory), args[0])
     else:
         command = args[0]
     ssh = kwargs.pop('conn')
