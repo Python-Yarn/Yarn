@@ -29,6 +29,18 @@ with cd("/usr/bin"):
 This example shows how simple the interface really is.  This would be the same as connecting to the host (192.168.1.2) with the user (yarn) and the password (yarn_is_aw3some!), then changing directory to ```/usr/bin``` and running ```ls -al pytho*```.  
 
 
+Of course, you could have nested the 'cd' contextmanager thusly:
+
+```
+with cd("/usr"):
+    with cd("bin"):
+        print(run("ls -al pytho*"))
+
+```
+
+And it would have worked the same.
+
+
 ### Yarnfile Example:
 ```
 from yarn.api import cd
