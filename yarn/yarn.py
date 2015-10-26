@@ -22,7 +22,7 @@ if __name__ == '__main__':
     if not args.hosts:
         raise Exception("Host list was empty")
     if not os.path.isfile(args.yarn_file):
-        raise Exception("Knit file {} couldn't be found".format(args.yarn_file))
+        raise Exception("Yarn file {} couldn't be found".format(args.yarn_file))
     sys.path.append(os.path.dirname(os.path.abspath(args.yarn_file)))
     import yarnfile
     env.user = args.user
