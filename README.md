@@ -71,9 +71,11 @@ This would output the same as the previous module example.  Of note, is that the
 ### The Environment
 The 'env' namespace contains several variables which can be set by the developer.
 * host_string - (String) This is the host to which the system is going to connect.  DNS names (if dns is working) can be used here.
+* host_port - (Integer) This is the port on the remove machine accepting incoming SSh connections.
 * user - (String) This is the username to use when connecting to the host.
 * password - (String) This is the password for the user.  If you have already copied an SSH key to the remote host, this is not required.
-* port - (Integer)
+* key - (String) Path to RSA key file to use to authenticate with remote host.
+* passphrase - (String) Password to use the key file.
 
 ### Using a RSA key to authenticate
 
