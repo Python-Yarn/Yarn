@@ -11,7 +11,7 @@ A single context manager (cd) is provided for running commands in a particular d
 
 ### Module-Use Example:
 ```
-from yarn.api import cd, env, run
+from yarn.api import env, cd, run
 
 
 env.host_string = '192.168.1.2'
@@ -41,7 +41,7 @@ And it would have worked the same.
 
 ### Yarnfile Example:
 ```
-from yarn.api import cd, run
+from yarn.api import env, cd, run
 
 
 def test():
@@ -80,7 +80,7 @@ The 'env' namespace contains several variables which can be set by the developer
 ### Using a RSA key to authenticate
 
 ```
-from yarn.api import cd, run
+from yarn.api import env, cd, run
 
 env.host_string = "192.168.1.2"
 env.host_port = 22
