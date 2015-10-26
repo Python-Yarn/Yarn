@@ -8,6 +8,7 @@ import importlib
 from yarn.api import env
 from yarn.api import run
 
+
 def parse_host_list(host_list):
     return host_list.split(",")
 
@@ -42,4 +43,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-    
+
