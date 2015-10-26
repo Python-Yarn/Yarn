@@ -7,6 +7,7 @@ import argparse
 import importlib
 from yarn.api import env
 
+
 def parse_host_list(host_list):
     return host_list.split(",")
 
@@ -34,4 +35,4 @@ if __name__ == '__main__':
         except AttributeError:
             print("No command called '{}' in the yarnfile".format(",".join(args.commands)))
 
-    
+
