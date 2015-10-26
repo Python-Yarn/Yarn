@@ -13,20 +13,46 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s - %(funcName)s: %(messag
 
 class Environment:
     host_string = ""
-    host_port = 22
+    _port = 22
     debug = True
     user = getpass.getuser()
     password = None
     working_directory = list()
     warn_only = True
     quiet = False
-    key = None
+    _key = None
     passphrase = None
     _paramiko_key = None
 
     @property
     def connection_ref(self):
         return "{}@{}".format(self.user, self.host_string)
+
+    @property
+    def host_port(self):
+        return self._port
+
+    @host_port.setter
+    def host_port(self, port):
+        """ Checks to make sure the port is valid """
+        if not isinstance(port, int):
+            raise AttributeError("host_port must be an integer")
+        elif 0 < port <= 65535:
+            self._port = port
+        else:
+            raise AttributeError("host_port must be ain integer between 1 and 65535")
+
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def key(self, key_file):
+        """ Verify the key file exists. Will remove stored paramiko key. """
+        if not os.path.exists(key_file):
+            raise OSError("key file does not exist")
+        self._key = key_file
+        self._paramiko_key = None
 
 
 env = Environment()
@@ -39,7 +65,7 @@ def ssh_connection(wrapped_function):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         if env.key is not None and env._paramiko_key is None:
-            env._paramiko_key = paramiko.RSAKey.from_private_key(env.key, password=env.passphrase)
+            env._paramiko_key = paramiko.RSAKey.from_private_key(open(env.key), password=env.passphrase)
         try:
             ssh.connect(env.host_string, env.host_port, username=env.user,
                         password=env.password, pkey=env._paramiko_key)
