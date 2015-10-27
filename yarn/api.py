@@ -66,6 +66,8 @@ def ssh_connection(wrapped_function):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         if env.key is not None and env._paramiko_key is None:
             env._paramiko_key = paramiko.RSAKey.from_private_key(open(env.key), password=env.passphrase)
+        if not env.host_string:
+            env.host_string = input("No hosts were specified.  Host IP/DNS Name: ")
         try:
             ssh.connect(env.host_string, env.host_port, username=env.user,
                         password=env.password, pkey=env._paramiko_key)
@@ -90,11 +92,11 @@ def cd(path):
 @ssh_connection
 def run(*args, **kwargs):
     if env.working_directory:
-        command = "cd {} && {}".format(os.path.join(*env.working_directory), args[0])
+        command = "cd {} && {}".format(" && cd ".join(env.working_directory), args[0])
     else:
         command = args[0]
     ssh = kwargs.pop('conn')
-    logger.debug("RUNNING '{}' on '{}'".format(command, env.host_string))
+    logger.debug("'{}' on '{}'".format(command, env.connection_ref))
     stdin, stdout, stderr = ssh.exec_command(command)
     stdout = "\n".join([a.strip() for a in stdout.readlines()])
     stderr = "\n".join(["ERROR: {}".format(a.strip()) for a in stderr.readlines()])
@@ -114,7 +116,7 @@ def put(*args, **kwargs):
     ssh = kwargs['conn']
     local_path = args[0]
     remote_path = args[1]
-    logger.debug("Putting {} on {}.  Placing it: {}".format(local_path, env.connection_ref, remote_path))
+    logger.debug("Uploading {} to {}:{}".format(local_path, env.connection_ref, remote_path))
     ftp = ssh.open_sftp()
     ftp.put(local_path, remote_path)
     ftp.close()
@@ -125,7 +127,7 @@ def get(*args, **kwargs):
     ssh = kwargs['conn']
     remote_path = args[0]
     local_path = args[1] if len(args) == 2 else os.path.join(os.path.abspath("."), os.path.split(remote_path)[-1])
-    logger.debug("Getting {} from {}.  Placing it: {}".format(remote_path, env.connection_ref, local_path))
+    logger.debug("Downloading {}:{}.  Placing it: {}".format(env.connection_ref, remote_path, local_path))
     ftp = ssh.open_sftp()
     ftp.get(remote_path, local_path)
     ftp.close()
