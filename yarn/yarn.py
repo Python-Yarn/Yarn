@@ -4,9 +4,10 @@ import os
 import sys
 import getpass
 import argparse
-import importlib
-from yarn.api import env
-from yarn.api import run
+if sys.version_info.major == 2:
+    from api import env, run
+else:
+    from yarn.api import env, run
 
 
 def parse_host_list(host_list):
