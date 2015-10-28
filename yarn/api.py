@@ -70,10 +70,12 @@ def ssh_connection(wrapped_function):
             env.host_string = input("No hosts were specified.  Host IP/DNS Name: ")
         try:
             ssh.connect(env.host_string, env.host_port, username=env.user,
-                        password=env.password, pkey=env._paramiko_key)
+                        pkey=env._paramiko_key)
             return wrapped_function(*args, conn=ssh)
         except AuthenticationException:
             env.password = getpass.getpass("Password for {}: ".format(env.connection_ref))
+            ssh.connect(env.host_string, env.host_port, username=env.user,
+                        password=env.password)
             return wrapped_function(*args, conn=ssh)
         finally:
             logging.info("Closing connection: {}".format(env.connection_ref))
