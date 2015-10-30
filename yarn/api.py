@@ -3,56 +3,16 @@ import sys
 import getpass
 import logging
 import paramiko
+if sys.version_info.major == 2:
+    from environment import Environment
+else:
+    from yarn.environment import Environment
 from paramiko.ssh_exception import AuthenticationException
 from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logging.basicConfig(format='[%(asctime)s] %(levelname)s - %(funcName)s: %(message)s')
-
-
-class Environment:
-    host_string = ""
-    _port = 22
-    debug = True
-    user = getpass.getuser()
-    password = None
-    working_directory = list()
-    warn_only = True
-    quiet = False
-    _key = None
-    passphrase = None
-    _paramiko_key = None
-
-    @property
-    def connection_ref(self):
-        return "{}@{}".format(self.user, self.host_string)
-
-    @property
-    def host_port(self):
-        return self._port
-
-    @host_port.setter
-    def host_port(self, port):
-        """ Checks to make sure the port is valid """
-        if not isinstance(port, int):
-            raise AttributeError("host_port must be an integer")
-        elif 0 < port <= 65535:
-            self._port = port
-        else:
-            raise AttributeError("host_port must be ain integer between 1 and 65535")
-
-    @property
-    def key(self):
-        return self._key
-
-    @key.setter
-    def key(self, key_file):
-        """ Verify the key file exists. Will remove stored paramiko key. """
-        if not os.path.exists(key_file):
-            raise OSError("key file does not exist")
-        self._key = key_file
-        self._paramiko_key = None
 
 
 env = Environment()
@@ -70,10 +30,12 @@ def ssh_connection(wrapped_function):
             env.host_string = input("No hosts were specified.  Host IP/DNS Name: ")
         try:
             ssh.connect(env.host_string, env.host_port, username=env.user,
-                        password=env.password, pkey=env._paramiko_key)
+                        pkey=env._paramiko_key)
             return wrapped_function(*args, conn=ssh)
         except AuthenticationException:
             env.password = getpass.getpass("Password for {}: ".format(env.connection_ref))
+            ssh.connect(env.host_string, env.host_port, username=env.user,
+                        password=env.password)
             return wrapped_function(*args, conn=ssh)
         finally:
             logging.info("Closing connection: {}".format(env.connection_ref))

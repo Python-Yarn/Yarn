@@ -24,13 +24,11 @@ def main():
     parser.add_argument(nargs='+', dest='commands')
 
     args = parser.parse_args() 
-
-    if not os.path.isfile(args.yarn_file):
-        raise Exception("Yarn file {} couldn't be found".format(args.yarn_file))
-
-    directory, yarnfile = os.path.split(os.path.abspath(args.yarn_file))
-    sys.path.insert(0, directory)
-    tasks = vars(__import__(yarnfile.split(".")[0]))
+    tasks = dict()
+    if os.path.isfile(args.yarn_file):
+        directory, yarnfile = os.path.split(os.path.abspath(args.yarn_file))
+        sys.path.insert(0, directory)
+        tasks = vars(__import__(yarnfile.split(".")[0]))
 
     if args.user:
         env.user = args.user
