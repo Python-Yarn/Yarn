@@ -12,8 +12,8 @@ setup(
     author='Jason L McFarland',
     author_email='jason.mcfarland1976+python-yarn@gmail.com',
     packages=['yarn',],
-    test_suite='nose.collector',
-    tests_require=['nose', 'paramiko'],
+#    test_suite='nose.collector',
+#    tests_require=['nose', 'paramiko'],
     install_requires=['paramiko>=1.13'],
     entry_points = {'console_scripts': ['yarn = yarn.yarn:main',]},
     classifiers=[
