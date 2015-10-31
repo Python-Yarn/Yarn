@@ -7,4 +7,4 @@ machine:
 
 test:
     override:
-        - nosetest -vv yarn/tests
+        - nosetests -vv yarn/tests
