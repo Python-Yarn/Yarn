@@ -9,7 +9,7 @@ Yarn is intended as a minimal subset of common-use commands.  The current list o
 
 A single context manager (cd) is provided for running commands in a particular directory.
 
-### Module-Use Example:
+#### Module-Use Example:
 ```
 from yarn.api import env, cd, run
 
@@ -39,7 +39,7 @@ with cd("/usr"):
 And it would have worked the same.
 
 
-### Yarnfile Example:
+#### Yarnfile Example:
 ```
 from yarn.api import env, cd, run
 
@@ -97,4 +97,65 @@ Output:
 ```
 [2015-10-26 12:27:00,865] DEBUG - run: RUNNING 'uname' on '192.168.1.2'
 Linux
+```
+
+### Getting parallel
+It is now possible to execute tasks in parallel.  You can do this via the ```@parallel``` decorator, or via the command line switch ```-P```.
+
+#### Module-Use Example:
+```
+from yarn.api import env, cd, run, parallel
+
+
+@parallel
+def find_python():
+    with cd("/usr/bin"):
+        print(run("ls -al pytho*"))
+
+
+env.host_string = '192.168.1.2'
+env.user = 'yarn'
+env.password = 'yarn_is_aw3some!'
+find_python()
+env.host_string = '192.168.1.3'
+find_python()
+
+```
+
+This would, when executed, run the ```find_python``` function on both hosts in parallel.  Now a yarnfile example:
+#### Yarnfile Example:
+```
+from yarn.api import env, cd, run
+from random import randint
+
+def find_python():
+    # This is so that we will actually see that there was parallel execution
+    # The second host in the queue may finish execution before the first 
+    run("sleep {}".format(randint(2,10)))
+    with cd("/usr/bin"):
+        print(run("ls -al pytho*"))
+
+```
+
+Then on the command line you would run:
+
+```yarn --user yarn -P -H 192.168.1.2,192.168.1.3 find_python```
+
+If you wish to use parallel execution, but don't have the same username to use across all hosts, you can use username@hostname, So you could run:
+
+```yarn -P -H yarn@192.168.1.2,yarn@192.168.1.3 find_python```
+
+The output might look like:
+
+```
+[2015-10-30 21:55:01,429] DEBUG - run: 'sleep 5' on 'yarn@192.168.1.2'
+[2015-10-30 21:55:01,442] DEBUG - run: 'sleep 3' on 'yarn@192.168.1.3'
+[2015-10-30 21:55:04,633] DEBUG - run: 'cd /usr/bin/ && ls -l pyth*' on 'yarn@192.168.1.3'
+lrwxrwxrwx 1 root root       9 Mar 16  2015 python -> python2.7
+lrwxrwxrwx 1 root root       9 Mar 16  2015 python2 -> python2.7
+-rwxr-xr-x 1 root root 3785928 Mar  1  2015 python2.7
+[2015-10-30 21:55:06,583] DEBUG - run: 'cd /usr/bin/ && ls -l pyth*' on 'yarn@192.168.1.2'
+lrwxrwxrwx 1 root root       9 Mar 16  2015 python -> python2.7
+lrwxrwxrwx 1 root root       9 Mar 16  2015 python2 -> python2.7
+-rwxr-xr-x 1 root root 3785928 Mar  1  2015 python2.7
 ```
