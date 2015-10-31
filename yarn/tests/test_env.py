@@ -19,7 +19,7 @@ class TestEnv(unittest.TestCase):
             env.host_port = 111111
 
     def test_env_user_autoset(self):
-        assert env.user == os.environ["USERNAME"], "Didn't get correct user.  ENV: {}".format(os.environ)
+        assert env.user == os.environ["USERNAME"], "Didn't get correct user.  FOUND: {} ENV: {}".format(env.user, os.environ["USERNAME"])
 
     def test_env_username_bad_input(self):
         with self.assertRaises(AttributeError):
