@@ -27,3 +27,9 @@ class TestChangeDirectory(unittest.TestCase):
                     pass
             assert env.working_directory == ["first"]
 
+    def test_empty(self):
+        def set_empty_cd():
+            with cd():
+                pass
+        self.assertRaises(TypeError, set_empty_cd)
+

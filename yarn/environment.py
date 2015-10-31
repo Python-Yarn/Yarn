@@ -2,12 +2,13 @@ import os
 import getpass
 
 class Environment:
+    parallel_jobs = list()
     host_string = ""
     _port = 22
     debug = True
     _user = getpass.getuser()
     _password = None
-    _working_directory = list()
+    working_directory = list()
     warn_only = True
     quiet = False
     _key = None
@@ -63,14 +64,4 @@ class Environment:
         if not isinstance(password, str):
             raise AttributeError("Passwords must be strings")
         self._password = password
-
-    @property
-    def working_directory(self):
-        return self._working_directory
-
-    @working_directory.setter
-    def working_directory(self, pathname):
-        if not isinstance(pathname, str):
-            raise AttributeError("Paths must be strings")
-        self._working_directory.append(pathname)
 

@@ -3,6 +3,7 @@ import sys
 import getpass
 import logging
 import paramiko
+import multiprocessing
 if sys.version_info.major == 2:
     from environment import Environment
 else:
@@ -16,6 +17,14 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s - %(funcName)s: %(messag
 
 
 env = Environment()
+
+
+def parallel(wrapped_function):
+    def _wrapped(*args, **kwargs):
+        task = multiprocessing.Process(target=wrapped_function, args=args, kwargs=kwargs)
+        env.parallel_jobs.append(task)
+        task.start()
+    return _wrapped
 
 
 def ssh_connection(wrapped_function):
@@ -93,3 +102,5 @@ def get(*args, **kwargs):
     ftp = ssh.open_sftp()
     ftp.get(remote_path, local_path)
     ftp.close()
+
+

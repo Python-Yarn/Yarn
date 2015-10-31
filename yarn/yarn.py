@@ -5,9 +5,9 @@ import sys
 import getpass
 import argparse
 if sys.version_info.major == 2:
-    from api import env, run
+    from api import env, run, parallel
 else:
-    from yarn.api import env, run
+    from yarn.api import env, run, parallel
 
 
 def parse_host_list(host_list):
@@ -16,10 +16,36 @@ def parse_host_list(host_list):
 def parse_yarn_file_path(yarnfile):
     return os.path.abspath(yarnfile)
 
+
+def execute(tasks, command, run_parallel=False):
+    @parallel
+    def parallel_execution(*args, **kwargs):
+        tasks = kwargs['tasks']
+        command = args[0]
+        try:
+            tasks[command]()
+        except KeyError:
+            print(run(command))
+
+    def serial_execution(*args, **kwargs):
+        tasks = kwargs['tasks']
+        command = args[0]
+        try:
+            tasks[command]()
+        except KeyError:
+            print(run(command))
+
+    if run_parallel:
+        parallel_execution(command, tasks=tasks)
+    else:
+        serial_execution(command, tasks=tasks)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--hosts', '-H', type=parse_host_list, help="Host(s) separated by commas")
     parser.add_argument('--user', '-U', type=str, help="Username to use for connecting, defaults to current username")
+    parser.add_argument('--parallel', '-P', dest="parallel", action="store_true", help="Run commands in parallel", default=False)
     parser.add_argument('--yarn-file', '-f', type=parse_yarn_file_path, help="Yarn file to use, defaults to yarnfile.py", default="./yarnfile.py")
     parser.add_argument(nargs='+', dest='commands')
 
@@ -36,17 +62,20 @@ def main():
     if args.hosts:
         for host in args.hosts:
             env.host_string = host
+            if "@" in host:
+                # This is to handle the ability to have username@hostname on the command line
+                env.user, env.host_string = host.split("@")
             for command in args.commands:
-                try:
-                    tasks[command]()
-                except KeyError:
-                    print(run(command))
+                if args.parallel:
+                    execute(tasks, command, True)
+                else:
+                    execute(tasks, command)
     else:
         for command in args.commands:
-            try:
-                tasks[command]()
-            except KeyError:
-                print(run(command))
+            if args.parallel:
+                execute(tasks, command, True)
+            else:
+                execute(tasks, command)
         
 
 
