@@ -21,7 +21,7 @@ env = Environment()
 
 def parallel(wrapped_function):
     def _wrapped(*args, **kwargs):
-        task = multiprocessing.Process(target=wrapped_function, args=(args, kwargs))
+        task = multiprocessing.Process(target=wrapped_function, args=args, kwargs=kwargs)
         env.parallel_jobs.append(task)
         task.start()
     return _wrapped
