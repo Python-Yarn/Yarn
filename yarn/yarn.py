@@ -47,6 +47,8 @@ def main():
     parser.add_argument('--user', '-U', type=str, help="Username to use for connecting, defaults to current username")
     parser.add_argument('--parallel', '-P', dest="parallel", action="store_true", help="Run commands in parallel", default=False)
     parser.add_argument('--yarn-file', '-f', type=parse_yarn_file_path, help="Yarn file to use, defaults to yarnfile.py", default="./yarnfile.py")
+    parser.add_argument('--warn-only', '-w', action="store_true", dest="warn_only", help="Do not halt upon finding an error", default=False)
+    parser.add_argument('--quiet', '-q', action="store_true", dest="quiet", help="Suppress extra output.", default=False)
     parser.add_argument(nargs='+', dest='commands')
 
     args = parser.parse_args()
@@ -58,7 +60,8 @@ def main():
 
     if args.user:
         env.user = args.user
-    env.quiet = False
+    env.quiet = args.quiet
+    env.warn_only = args.warn_only
     if args.hosts:
         for host in args.hosts:
             env.host_string = host

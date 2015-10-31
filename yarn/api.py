@@ -67,16 +67,20 @@ def run(*args, **kwargs):
     else:
         command = args[0]
     ssh = kwargs.pop('conn')
-    logger.debug("'{}' on '{}'".format(command, env.connection_ref))
+    if not env.quiet:
+        logger.debug("'{}' on '{}'".format(command, env.connection_ref))
     stdin, stdout, stderr = ssh.exec_command(command)
-    stdout = "\n".join([a.strip() for a in stdout.readlines()])
-    stderr = "\n".join(["ERROR: {}".format(a.strip()) for a in stderr.readlines()])
+    stdout = ["[{}] '{}'".format(env.connection_ref, a.decode('utf-8').strip()) for a in stdout.read().splitlines()]
+    stderr = ["ERROR: [{}] '{}'".format(env.connection_ref, a.decode('utf-8').strip()) for a in stderr.read().splitlines()]
     if not stderr:
-        return stdout
+        if not env.quiet:
+            for a in stdout:
+                logging.info(a)
+        return "\n".join(stdout)
+    if not env.quiet:
+        logging.warning("\n".join(stderr))
+        logging.warning("ENV_DEBUG: '{}'".format(run("env")))
     if not env.warn_only:
-        logging.warning(stderr)
-        with cd(None):
-            logging.warning("ENV_DEBUG: '{}'".format(run("env")))
         sys.exit(1)
 
     return False

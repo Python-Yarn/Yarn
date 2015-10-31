@@ -9,7 +9,7 @@ class Environment:
     _user = getpass.getuser()
     _password = None
     working_directory = list()
-    warn_only = True
+    warn_only = False
     quiet = False
     _key = None
     passphrase = None
