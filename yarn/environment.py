@@ -2,7 +2,7 @@ import os
 import getpass
 
 class Environment:
-    parallel_jobs = list()
+    parallel_tasks = list()
     host_string = ""
     _port = 22
     debug = True
@@ -64,4 +64,3 @@ class Environment:
         if not isinstance(password, str):
             raise AttributeError("Passwords must be strings")
         self._password = password
-

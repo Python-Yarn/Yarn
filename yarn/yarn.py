@@ -49,7 +49,7 @@ def main():
     parser.add_argument('--yarn-file', '-f', type=parse_yarn_file_path, help="Yarn file to use, defaults to yarnfile.py", default="./yarnfile.py")
     parser.add_argument(nargs='+', dest='commands')
 
-    args = parser.parse_args() 
+    args = parser.parse_args()
     tasks = dict()
     if os.path.isfile(args.yarn_file):
         directory, yarnfile = os.path.split(os.path.abspath(args.yarn_file))
@@ -66,21 +66,13 @@ def main():
                 # This is to handle the ability to have username@hostname on the command line
                 env.user, env.host_string = host.split("@")
             for command in args.commands:
-                if args.parallel:
-                    execute(tasks, command, True)
-                else:
-                    execute(tasks, command)
+                execute(tasks, command, args.parallel)
     else:
         for command in args.commands:
-            if args.parallel:
-                execute(tasks, command, True)
-            else:
-                execute(tasks, command)
-        
+            execute(tasks, command, args.parallel)
+
 
 
 
 if __name__ == '__main__':
     main()
-
-

@@ -22,7 +22,7 @@ env = Environment()
 def parallel(wrapped_function):
     def _wrapped(*args, **kwargs):
         task = multiprocessing.Process(target=wrapped_function, args=args, kwargs=kwargs)
-        env.parallel_jobs.append(task)
+        env.parallel_tasks.append(task)
         task.start()
     return _wrapped
 
@@ -102,5 +102,3 @@ def get(*args, **kwargs):
     ftp = ssh.open_sftp()
     ftp.get(remote_path, local_path)
     ftp.close()
-
-
