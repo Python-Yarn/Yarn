@@ -4,6 +4,8 @@ machine:
     python:
         version:
             3.5.0
+    environment:
+        USERNAME: yarnregressionuser
 
 test:
     override:
