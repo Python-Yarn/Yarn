@@ -1,12 +1,12 @@
 import os
-import getpass
+from getpass import getuser
 
-class Environment:
+class Environment(object):
     parallel_tasks = list()
     host_string = ""
     _port = 22
     debug = True
-    _user = getpass.getuser()
+    _user = getuser()
     _password = None
     working_directory = list()
     warn_only = False
@@ -31,7 +31,7 @@ class Environment:
         elif 0 < port <= 65535:
             self._port = port
         else:
-            raise AttributeError("host_port must be ain integer between 1 and 65535")
+            raise AttributeError("host_port must be an integer between 1 and 65535")
 
     @property
     def key(self):
