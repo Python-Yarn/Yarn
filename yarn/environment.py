@@ -2,22 +2,53 @@ import os
 from getpass import getuser
 
 class Environment(object):
+
+    # This is the list which contains the processes for parallel execution
     parallel_tasks = list()
+
+    # This is only in place to be overridden by the yarn command line.  Normal
+    # functions which are tagged with @parallel will automatically execute
+    # in parallel.
     run_parallel = True
+
+    # The host to which we are connecting to execute tasks
     host_string = ""
+
+    # The port to use for the connection.
     _port = 22
+
+    # Debugging flag
     debug = True
+
+    # The username to use for the connection authentication.
     _user = getuser()
+
+    # The password (assuming one is needed) for the connection.
     _password = None
+
+    # This is the list which is in play for the cd contextmanager
     working_directory = list()
+
+    # Whether or not to halt on a task failure.
     warn_only = False
+
+    # Whether or not to show all output in the log.  The logging still needs
+    # some work for this to truly be as useful as I want.
+    # [See GitHub Issue # 13]
     quiet = False
+
+    # If an RSA key is to be used here is the ref
     _key = None
+
+    # If we are using an RSA key, we will need a passphrase
     passphrase = None
+
+    # This is the paramiko key reference.
     _paramiko_key = None
 
     @property
-    def connection_ref(self):
+    def connection_string(self):
+        # This is the connection string which is principally used for logging.
         return "{}@{}".format(self.user, self.host_string)
 
     @property
