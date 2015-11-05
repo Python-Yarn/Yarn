@@ -11,56 +11,48 @@ else:
 
 
 def parse_host_list(host_list):
+    """This is simply meant to parse the host list"""
     return host_list.split(",")
 
 
 def parse_yarn_file_path(yarnfile):
     return os.path.abspath(yarnfile)
 
-
+# This is set to parallel so that if there is a command line request for it,
+# it can run in parallel.  This is due to the env.run_parallel setting.  If a
+# developer wants to explicitly disallow parallel execution of a task, they can
+# omit the @parallel call on any function they wish.
 @parallel
 def execute_task(*args, **kwargs):
-    tasks = args[0]
-    command = args[1]
+    tasks, command = args
     if command in tasks:
-        print(tasks[command]())
+        return tasks[command]()
     else:
-        print(run(command))
+        return run(command)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--hosts', '-H',
-                        type=parse_host_list,
+    parser.add_argument('--hosts', '-H', type=parse_host_list,
                         help="Host(s) separated by commas.")
-    parser.add_argument('--user', '-U',
-                        type=str,
+    parser.add_argument('--user', '-U', type=str,
                         help="Username to use for connecting, defaults to current username.")
-    parser.add_argument('--parallel', '-P',
-                        dest="parallel",
-                        action="store_true",
+    parser.add_argument('--parallel', '-P', dest="parallel", action="store_true",
                         help="Run commands in parallel.",
                         default=False)
-    parser.add_argument('--port', '-p',
-                        dest="port",
-                        type=int,
+    parser.add_argument('--port', '-p', dest="port", type=int,
                         help="What port to use for connecting to the remote host. Defaults to 22",
                         default=22)
-    parser.add_argument('--yarn-file', '-f',
-                        type=parse_yarn_file_path,
+    parser.add_argument('--yarn-file', '-f', type=parse_yarn_file_path,
                         help="Yarn file to use, defaults to yarnfile.py.",
                         default="./yarnfile.py")
-    parser.add_argument('--warn-only', '-w',
-                        action="store_true",
-                        dest="warn_only",
+    parser.add_argument('--warn-only', '-w', action="store_true", dest="warn_only",
                         help="Do not halt upon finding an error.",
                         default=False)
-    parser.add_argument('--quiet', '-q',
-                        action="store_true",
-                        dest="quiet",
+    parser.add_argument('--quiet', '-q', action="store_true", dest="quiet",
                         help="Suppress extra output.",
                         default=False)
-    parser.add_argument(nargs='+', dest='commands')
+    parser.add_argument(dest='commands', nargs=argparse.REMAINDER)
 
     args = parser.parse_args()
     tasks = dict()
@@ -90,6 +82,7 @@ def main():
     else:
         for command in args.commands:
             execute_task(tasks, command)
+    return
 
 
 
