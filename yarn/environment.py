@@ -3,6 +3,7 @@ from getpass import getuser
 
 class Environment(object):
     parallel_tasks = list()
+    run_parallel = True
     host_string = ""
     _port = 22
     debug = True
