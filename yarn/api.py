@@ -22,6 +22,32 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s - %(funcName)s: %(messag
 # use this.
 env = Environment()
 
+# Starting the work for sudo per GitHub Issue #20
+def sudo(command):
+    @ssh_connection
+    def sudo_command(*args, **kwargs):
+        conn = kwargs['conn']
+        stdin, stdout, stderr = conn.exec_command(kwargs['command'], get_pty=True)
+        stdin.flush()
+        if not env.password:
+            env.password = getpass("Password for {}: ".format(env.connection_string))
+        stdin.write('{}\n'.format(env.password))
+        stdin.flush()
+        # print the results
+        stdout = [a.decode('utf-8').strip() for a in stdout.read().splitlines()]
+        stderr = ["ERROR: [{}] '{}'".format(env.connection_string, a.decode('utf-8').strip()) for a in stderr.read().splitlines()]
+        if not stderr:
+            if not env.quiet:
+                for a in stdout:
+                    logging.info("[{}] - {}".format(env.connection_string, a))
+            ret = "\n".join(stdout)
+            return ret
+        if not env.quiet:
+            logging.warning("\n".join(stderr))
+            logging.warning("ENV_DEBUG: '{}'".format(run("env")))
+        if not env.warn_only:
+            sys.exit(1)
+    return sudo_command(command='sudo -Si {}'.format(command))
 
 # The joys of running in parallel
 def parallel(wrapped_function):
