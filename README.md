@@ -132,7 +132,7 @@ from random import randint
 
 def find_python():
     # This is so that we will actually see that there was parallel execution
-    # The second host in the queue may finish execution before the first 
+    # The second host in the queue may finish execution before the first
     run("sleep {}".format(randint(2,10)))
     with cd("/usr/bin"):
         print(run("ls -al pytho*"))
@@ -160,4 +160,24 @@ lrwxrwxrwx 1 root root       9 Mar 16  2015 python2 -> python2.7
 lrwxrwxrwx 1 root root       9 Mar 16  2015 python -> python2.7
 lrwxrwxrwx 1 root root       9 Mar 16  2015 python2 -> python2.7
 -rwxr-xr-x 1 root root 3785928 Mar  1  2015 python2.7
+```
+
+
+### Running commands as sudo
+
+As of my most current push there is a minimal sudo implmentation.  It works
+nearly identically to the run function, only it will execute in sudo.  It will
+use the ```env.password``` setting, if provided.  Otherwise the system will
+query for the sudo password.
+
+#### Sudo example
+```
+from yarn.api import env, cd, sudo
+
+env.host_string = "192.168.1.2"
+env.user = "yarntestuser"
+env.password = 'yarn_is_aw3some'
+
+print(sudo("apt-get update"))
+
 ```
