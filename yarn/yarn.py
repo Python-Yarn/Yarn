@@ -28,7 +28,7 @@ def execute_task(*args, **kwargs):
     if command in tasks:
         return tasks[command]()
     else:
-        return run(command)
+        return print(run(command))
 
 
 def main():
@@ -82,7 +82,6 @@ def main():
     else:
         for command in args.commands:
             execute_task(tasks, command)
-    return
 
 
 
