@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import paramiko
+import subprocess
 import multiprocessing
 if sys.version_info.major == 2:
     from environment import Environment
@@ -21,6 +22,25 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s - %(funcName)s: %(messag
 # Here is the global environment for the system.  Pretty much everyone will
 # use this.
 env = Environment()
+
+# Starting the work for local execution per GitHub Issue #20
+def local(command):
+    proc = subprocess.Popen(command, shell=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    stdout = [a.decode('utf-8').strip() for a in stdout.splitlines()]
+    stderr = ["ERROR: [{}] '{}'".format(env.connection_string, a.decode('utf-8').strip()) for a in stderr.splitlines()]
+    if not stderr:
+        if not env.quiet:
+            for a in stdout:
+                logging.info("[{}] - {}".format(env.connection_string, a))
+        ret = "\n".join(stdout)
+        return ret
+    if not env.quiet:
+        logging.warning("\n".join(stderr))
+        logging.warning("ENV_DEBUG: '{}'".format(run("env")))
+    if not env.warn_only:
+        sys.exit(1)
 
 # Starting the work for sudo per GitHub Issue #20
 def sudo(command):
