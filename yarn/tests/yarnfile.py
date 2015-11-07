@@ -22,4 +22,6 @@ def test():
     # print(sudo("uname -r"))
     # print("ENV")
     # print(run("env"))
-    print(local("env"))
+    print(local("en"))
+
+# test()

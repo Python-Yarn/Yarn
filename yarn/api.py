@@ -29,16 +29,16 @@ def local(command):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     stdout = [a.decode('utf-8').strip() for a in stdout.splitlines()]
-    stderr = ["ERROR: [{}] '{}'".format(env.connection_string, a.decode('utf-8').strip()) for a in stderr.splitlines()]
+    stderr = ["ERROR: [LOCAL] '{}'".format(a.decode('utf-8').strip()) for a in stderr.splitlines()]
     if not stderr:
         if not env.quiet:
             for a in stdout:
-                logging.info("[{}] - {}".format(env.connection_string, a))
+                logging.info("[LOCAL] - {}".format(a))
         ret = "\n".join(stdout)
         return ret
     if not env.quiet:
         logging.warning("\n".join(stderr))
-        logging.warning("ENV_DEBUG: '{}'".format(run("env")))
+        logging.warning("ENV_DEBUG: '{}'".format(local("env")))
     if not env.warn_only:
         sys.exit(1)
 
