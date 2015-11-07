@@ -181,3 +181,16 @@ env.password = 'yarn_is_aw3some'
 print(sudo("apt-get update"))
 
 ```
+
+### Running commands as locally
+
+This is simply a wrapper to subprocess.Popen.  It doesn't do anything super special.
+
+#### Sudo example
+```
+from yarn.api import env, cd, local
+
+print(local("uptime"))
+
+```
+
