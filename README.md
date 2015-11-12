@@ -6,6 +6,8 @@ Yarn is intended as a minimal subset of common-use commands.  The current list o
 * run - Run a command on the command line
 * get - Download a file from a remote path
 * put - Upload a file to a remote path
+* sudo - Run a command with sudo
+* local - Run a command on the local system
 
 A single context manager (cd) is provided for running commands in a particular directory.
 
